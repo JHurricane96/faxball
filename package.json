@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A serverless P2P football game using WebRTC and TypeScript",
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "webpack --node-env production",
     "start": "webpack serve --mode development"
   },
   "devDependencies": {
