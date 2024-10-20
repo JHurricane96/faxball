@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>P2P Football Game</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>P2P Football Game</h1>
+  
+  <div id="setup">
+    <button id="hostButton">Host Game</button>
+    <button id="joinButton">Join Game</button>
+  </div>
+
+  <!-- Signaling Section -->
+  <div id="signaling" class="hidden">
+    <!-- Host Offer Display -->
+    <div id="hostOfferSection" class="hidden">
+      <h2>Host Offer</h2>
+      <textarea id="hostOffer" readonly placeholder="Host Offer will appear here"></textarea>
+      <p>Share this offer with players.</p>
+    </div>
+
+    <!-- Host Answer Reception -->
+    <div id="hostAnswerSection" class="hidden">
+      <h2>Host Receive Player Answer</h2>
+      <textarea id="hostRemoteAnswer" placeholder="Paste Player Answer Here"></textarea>
+      <button id="hostAddPeer">Add Peer</button>
+      <p>Repeat for each player.</p>
+    </div>
+
+    <!-- Player Answer Submission -->
+    <div id="playerAnswerSection" class="hidden">
+      <h2>Player Answer</h2>
+      <textarea id="playerOffer" placeholder="Paste Host Offer Here"></textarea>
+      <button id="playerCreateAnswer">Create Answer</button>
+      <textarea id="playerAnswer" readonly placeholder="Share Answer with Host"></textarea>
+      <p>Send this answer back to the host.</p>
+    </div>
+  </div>
+
+  <!-- Start Game Button -->
+  <button id="startGameButton" class="hidden">Start Game</button>
+
+  <!-- Game Section -->
+  <div id="game" class="hidden">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="instructions">
+      <p>Players use arrow keys to move their circles. Collide with the ball to kick it!</p>
+    </div>
+  </div>
+
+  <script src="dist/bundle.js"></script>
+</body>
+</html>
