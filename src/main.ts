@@ -157,7 +157,7 @@ function createPeerConnection(peerId: string): RTCPeerConnection {
 
   dataChannel.onmessage = (event) => {
     const input: InputData = JSON.parse(event.data);
-    handlePlayerInput(input);
+    handlePlayerInput(input, peerId);
   };
 
   dataChannel.onopen = () => {
@@ -284,9 +284,8 @@ function initializePlayerGameLoop() {
 }
 
 // Handle Player Inputs (Host)
-function handlePlayerInput(input: InputData) {
-  console.log(input);
-  const player = gameState.players.find(p => p.id === input.playerId);
+function handlePlayerInput(input: InputData, playerId: string) {
+  const player = gameState.players.find(p => p.id === playerId);
   if (!player) return;
 
   const speed = 5;
