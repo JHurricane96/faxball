@@ -1,4 +1,5 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/main.ts',
@@ -24,6 +25,12 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     publicPath: process.env.NODE_ENV === 'production' ? '/faxball/' : '/',
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html', // Path to your HTML template
+      filename: 'index.html', // Output filename in the dist folder
+    }),
+  ],
   devServer: {
     static: './',
     port: 8080,
