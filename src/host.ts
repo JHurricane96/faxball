@@ -1,7 +1,7 @@
 import '../styles.css';
 import { copyToClipboard } from "./clipboard";
 import { Game, initGameState } from "./game";
-import { PlayerState, GameState, InputMap, Directions } from "./types";
+import { GameState, InputMap, Directions } from "./types";
 import { generateUniqueId, waitForICEGatheringComplete } from "./utils";
 
 // UI Elements
@@ -20,12 +20,6 @@ const startGameButton = document.getElementById('startGameButton') as HTMLButton
 const gameDiv = document.getElementById('game') as HTMLDivElement;
 const gameCanvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = gameCanvas.getContext('2d');
-
-// Host Game State
-// let gameState: GameState = {
-//   ball: { x: 400, y: 300, vx: 0, vy: 0 },
-//   players: []
-// };
 
 const playerInputs: InputMap = {};
 
@@ -85,14 +79,6 @@ function createPeerConnection(peerId: string): RTCPeerConnection {
 
 // Initialize Host
 (async () => {
-  // Initialize host player
-  // const hostPlayer: PlayerState = {
-  //   id: 'host', // Special ID for host
-  //   x: 100,
-  //   y: 100,
-  //   color: 'black' // Host's player color
-  // };
-  // gameState.players.push(hostPlayer);
 
   // Create RTCPeerConnection for the first peer
   const peerId = generateUniqueId();
@@ -139,18 +125,6 @@ hostAddPeerButton.onclick = async () => {
 
   const answer = new RTCSessionDescription(JSON.parse(answerText));
   await peerConnection.setRemoteDescription(answer);
-
-  // Add player to game state
-  // const newPlayer: Player = {
-  //   id: latestPeerId,
-  //   x: Math.random() * gameCanvas.width,
-  //   y: Math.random() * gameCanvas.height,
-  //   color: playerColors[Math.floor(Math.random() * playerColors.length)]
-  // };
-  // gameState.players.push(newPlayer);
-
-  // // Broadcast the updated game state to all peers
-  // broadcastGameState();
 
   // Clear the remote answer textarea for the next peer
   hostRemoteAnswerTextarea.value = '';
