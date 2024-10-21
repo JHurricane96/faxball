@@ -2,7 +2,7 @@ import '../styles.css';
 import { copyToClipboard } from "./clipboard";
 import { Game, initGameState } from "./game";
 import { GameState, InputMap, Directions } from "./types";
-import { generateUniqueId, waitForICEGatheringComplete } from "./utils";
+import { generateUniqueId, getDirectionFromKey, waitForICEGatheringComplete } from "./utils";
 
 // UI Elements
 const signalingDiv = document.getElementById('signaling') as HTMLDivElement;
@@ -22,6 +22,7 @@ const gameCanvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = gameCanvas.getContext('2d');
 
 const playerInputs: InputMap = {};
+let pressedKeys: Directions = new Set();
 
 // Peer Management
 let peers: Map<string, RTCPeerConnection> = new Map();
@@ -132,13 +133,28 @@ hostAddPeerButton.onclick = async () => {
   alert(`Peer ${latestPeerId} added.`);
 };
 
+// Handle Keyboard Input
+function handlePlayerMovement() {
+  window.addEventListener('keydown', (e) => {
+    const direction = getDirectionFromKey(e.key);
+    if (direction) {
+      pressedKeys.add(direction);
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    const direction = getDirectionFromKey(e.key);
+    if (direction) {
+      pressedKeys.delete(direction);
+    }
+  });
+}
+
 // Initialize Game Loop (Host)
 function initializeHostGameLoop() {
   let gameState = initGameState(['host', ...Array.from(peers.keys())]);
   const game = new Game(gameState);
   function gameLoop() {
-    // updateBall();
-    // draw();
+    playerInputs['host'] = pressedKeys;
     game.updateHost(playerInputs);
     game.draw(ctx);
     gameState = game.toState();
@@ -150,6 +166,7 @@ function initializeHostGameLoop() {
 
 // Start Game Button (Host)
 startGameButton.onclick = () => {
+  handlePlayerMovement();
   initializeHostGameLoop();
   gameDiv.classList.remove('hidden');
   signalingDiv.classList.add('hidden');

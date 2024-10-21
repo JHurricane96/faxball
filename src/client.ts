@@ -1,8 +1,8 @@
 import '../styles.css';
 import { copyToClipboard } from "./clipboard";
 import { Game } from "./game";
-import { Direction, Directions, GameState } from "./types";
-import { waitForICEGatheringComplete } from "./utils";
+import { Directions, GameState } from "./types";
+import { getDirectionFromKey, waitForICEGatheringComplete } from "./utils";
 
 // UI Elements
 const signalingDiv = document.getElementById('signaling') as HTMLDivElement;
@@ -22,22 +22,6 @@ let dataChannel: RTCDataChannel;
 let gameState: GameState;// Flag to ensure game loop starts only once
 let gameLoopStarted: boolean = false;
 let pressedKeys: Directions = new Set();
-
-// Map Arrow Keys to Directions
-function getDirectionFromKey(key: string): Direction | null {
-  switch (key) {
-    case 'ArrowUp':
-      return 'up';
-    case 'ArrowDown':
-      return 'down';
-    case 'ArrowLeft':
-      return 'left';
-    case 'ArrowRight':
-      return 'right';
-    default:
-      return null;
-  }
-}
 
 // Send input to host
 function sendPlayerInput() {

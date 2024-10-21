@@ -41,7 +41,6 @@ export class Player {
   }
 
   update(input: Set<string>): void {
-    console.log(input);
     if (input.has('up')) {
       this.y -= 1;
     }
