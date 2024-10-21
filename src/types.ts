@@ -1,11 +1,11 @@
-export interface Player {
+export interface PlayerState {
   id: string;
   x: number;
   y: number;
   color: string;
 }
 
-export interface Ball {
+export interface BallState {
   x: number;
   y: number;
   vx: number;
@@ -13,12 +13,13 @@ export interface Ball {
 }
 
 export interface GameState {
-  ball: Ball;
-  players: Player[];
+  ball: BallState;
+  players: PlayerState[];
 }
 
-export interface InputData {
-  type: 'move';
-  direction: 'up' | 'down' | 'left' | 'right';
-  playerId: string;
+export type Direction = 'up' | 'down' | 'left' | 'right';
+export type Directions = Set<Direction>;
+
+export interface InputMap {
+  [playerId: string]: Directions;
 }

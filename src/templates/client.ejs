@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>
+    <%= data.title %>
+  </title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>P2P Football Game</h1>
+
+  <!-- Signaling Section -->
+  <div id="signaling">
+    <!-- Player Answer Submission -->
+    <div id="playerAnswerSection">
+      <h2>Player Answer</h2>
+      <textarea id="playerOffer" placeholder="Paste Host Offer Here"></textarea>
+      <button id="playerCreateAnswer">Create Answer</button>
+      <textarea id="playerAnswer" readonly placeholder="Share Answer with Host"></textarea>
+      <p>Send this answer back to the host.</p>
+    </div>
+  </div>
+
+  <!-- Game Section -->
+  <div id="game" class="hidden">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="instructions">
+      <p>Players use arrow keys to move their circles. Collide with the ball to kick it!</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="<%= data.script %>"></script>
+</body>
+
+</html>
