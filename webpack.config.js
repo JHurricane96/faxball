@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { htmlWebpackPluginTemplateCustomizer } = require('template-ejs-loader')
 
 module.exports = {
   entry: {
@@ -19,11 +20,10 @@ module.exports = {
         use: ['style-loader', 'css-loader'], // Enables importing CSS in TypeScript
       },
       {
-        test: /\.ejs$/,
-        loader: 'ejs-loader',
-        options: {
-          variable: 'data',
-        },
+        test: /\.ejs$/i,
+        use: ['html-loader', {
+          loader: 'template-ejs-loader',
+        }],
       },
     ],
   },
@@ -39,28 +39,40 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './src/templates/index.ejs',
-      // chunks: ['host'],
+      template: htmlWebpackPluginTemplateCustomizer({
+        templatePath: './src/templates/index.ejs',
+        templateEjsLoaderOption: {
+          data: {
+            title: 'Faxball',
+          }
+        }
+      }),
+      chunks: [],
       title: 'Faxball',
-      // script: 'host.bundle.js'
     }),
     new HtmlWebpackPlugin({
       filename: 'host/index.html',
-      template: './src/templates/host.ejs',
       chunks: ['host'],
-      templateParameters: {
-        title: 'Host - Faxball',
-        script: 'host.bundle.js'
-      },
+      template: htmlWebpackPluginTemplateCustomizer({
+        templatePath: './src/templates/host.ejs',
+        templateEjsLoaderOption: {
+          data: {
+            title: 'Host - Faxball',
+          }
+        }
+      }),
     }),
     new HtmlWebpackPlugin({
       filename: 'client/index.html',
-      template: './src/templates/client.ejs',
       chunks: ['client'],
-      templateParameters: {
-        title: 'Client - Faxball',
-        script: 'client.bundle.js'
-      },
+      template: htmlWebpackPluginTemplateCustomizer({
+        templatePath: './src/templates/client.ejs',
+        templateEjsLoaderOption: {
+          data: {
+            title: 'Client - Faxball',
+          }
+        }
+      }),
     }),
   ],
   devServer: {

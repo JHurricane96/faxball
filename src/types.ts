@@ -1,5 +1,6 @@
 export interface PlayerState {
   id: string;
+  team: number;
   x: number;
   y: number;
   color: string;
@@ -15,6 +16,7 @@ export interface BallState {
 export interface GameState {
   ball: BallState;
   players: PlayerState[];
+  score: number[];
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right';

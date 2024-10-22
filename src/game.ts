@@ -1,6 +1,11 @@
 import { PlayerState, BallState, GameState, InputMap, Directions } from './types';
 const gameCanvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 
+const scoreSpans = [
+  document.getElementById('score-0') as HTMLSpanElement,
+  document.getElementById('score-1') as HTMLSpanElement,
+]
+
 // Player Colors
 export const playerColors = [
   'blue',
@@ -15,12 +20,14 @@ export const playerColors = [
 
 export class Player {
   id: string;
+  team: number;
   x: number;
   y: number;
   color: string;
 
   constructor(playerState: PlayerState) {
     this.id = playerState.id;
+    this.team = playerState.team
     this.x = playerState.x;
     this.y = playerState.y;
     this.color = playerState.color;
@@ -34,6 +41,7 @@ export class Player {
   toState(): PlayerState {
     return {
       id: this.id,
+      team: this.team,
       x: this.x,
       y: this.y,
       color: this.color
@@ -61,12 +69,14 @@ export class Ball {
   y: number;
   vx: number;
   vy: number;
+  radius: number;
 
   constructor(ballState: BallState) {
     this.x = ballState.x;
     this.y = ballState.y;
     this.vx = ballState.vx;
     this.vy = ballState.vy;
+    this.radius = 15;
   }
 
   fromState(ballState: BallState) {
@@ -99,10 +109,14 @@ export class Ball {
 export class Game {
   ball: Ball;
   players: Player[];
+  score: number[];
+  goalDims: number[];
 
   constructor(gameState: GameState) {
     this.ball = new Ball(gameState.ball);
     this.players = gameState.players.map(playerState => new Player(playerState));
+    this.score = gameState.score;
+    this.goalDims = [gameCanvas.height / 4, gameCanvas.height * 3 / 4];
   }
 
   fromState(gameState: GameState) {
@@ -111,23 +125,54 @@ export class Game {
     for (let i = 0; i < gameState.players.length; i++) {
       this.players[i].fromState(gameState.players[i]);
     }
+
+    this.score = gameState.score;
   }
 
   toState(): GameState {
     return {
       ball: this.ball.toState(),
-      players: this.players.map(player => player.toState())
+      players: this.players.map(player => player.toState()),
+      score: this.score,
     };
+  }
+
+  reset() {
+    this.ball.x = gameCanvas.width / 2;
+    this.ball.y = gameCanvas.height / 2;
+    this.ball.vx = 0;
+    this.ball.vy = 0;
+
+    for (const player of this.players) {
+      const x = Math.random() * gameCanvas.width / 2
+      player.x = player.team ? x + gameCanvas.width / 2 : x;
+      player.y = Math.random() * gameCanvas.height;
+    }
   }
 
   updateHost(inputMap: InputMap) {
     this.ball.update();
 
+    // Goal handling
+    let isGoal = false;
+    if (this.ball.x <= this.ball.radius && this.ball.y >= this.goalDims[0] && this.ball.y <= this.goalDims[1]) {
+      this.score[1] += 1;
+      isGoal = true;
+    }
+    else if (this.ball.x >= gameCanvas.width - this.ball.radius && this.ball.y >= this.goalDims[0] && this.ball.y <= this.goalDims[1]) {
+      this.score[0] += 1;
+      isGoal = true;
+    }
+    if (isGoal) {
+      this.reset();
+      return;
+    }
+
     // Boundary collision
-    if (this.ball.x <= 15 || this.ball.x >= gameCanvas.width - 15) {
+    if (this.ball.x <= this.ball.radius || this.ball.x >= gameCanvas.width - this.ball.radius) {
       this.ball.vx = -this.ball.vx;
     }
-    if (this.ball.y <= 15 || this.ball.y >= gameCanvas.height - 15) {
+    if (this.ball.y <= this.ball.radius || this.ball.y >= gameCanvas.height - this.ball.radius) {
       this.ball.vy = -this.ball.vy;
     }
 
@@ -179,6 +224,15 @@ export class Game {
       ctx.fill();
       ctx.closePath();
     }
+
+    // Draw Goals
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, this.goalDims[0], 10, this.goalDims[1] - this.goalDims[0]);
+    ctx.fillRect(gameCanvas.width - 10, this.goalDims[0], 10, this.goalDims[1] - this.goalDims[0]);
+
+    // Draw Score
+    scoreSpans[0].innerText = this.score[0].toString();
+    scoreSpans[1].innerText = this.score[1].toString();
   }
 }
 
@@ -191,13 +245,17 @@ export function initGameState(playerIds: string[]): GameState {
   };
 
   const players: PlayerState[] = playerIds.map((id, index) => {
+    const x = Math.random() * gameCanvas.width / 2
     return {
       id,
-      x: Math.random() * gameCanvas.width,
+      team: index % 2,
+      x: index % 2 ? x + gameCanvas.width / 2 : x,
       y: Math.random() * gameCanvas.height,
       color: playerColors[index % playerColors.length]
     };
   });
 
-  return { ball, players };
+  const score = [0, 0];
+
+  return { ball, players, score };
 }
