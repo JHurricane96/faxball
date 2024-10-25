@@ -5,7 +5,8 @@ const { htmlWebpackPluginTemplateCustomizer } = require('template-ejs-loader')
 module.exports = {
   entry: {
     host: './src/host.ts',
-    client: './src/client.ts'
+    client: './src/client.ts',
+    index: './src/index.ts',
   },
   devtool: 'source-map',
   module: {
@@ -47,7 +48,7 @@ module.exports = {
           }
         }
       }),
-      chunks: [],
+      chunks: ['index'],
       title: 'Faxball',
     }),
     new HtmlWebpackPlugin({
