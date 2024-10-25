@@ -27,7 +27,8 @@ export function waitForICEGatheringComplete(pc: RTCPeerConnection, isHost: boole
     if (pc.iceGatheringState === 'complete') {
       resolve();
     } else {
-      if (isHost) {
+      // if (isHost) {
+      if (false) {
         // Handle ICE candidates
         pc.onicecandidate = (event) => {
           if (event.candidate) {
