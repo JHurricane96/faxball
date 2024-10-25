@@ -3,6 +3,7 @@ import { copyToClipboard } from "./clipboard";
 import { Game, initGameState } from "./game";
 import { GameState, InputMap, Directions } from "./types";
 import { generateUniqueId, getDirectionFromKey, waitForICEGatheringComplete } from "./utils";
+import { ICE_SERVERS } from './stun_servers';
 
 // UI Elements
 const signalingDiv = document.getElementById('signaling') as HTMLDivElement;
@@ -40,16 +41,8 @@ function broadcastGameState(gameState: GameState) {
 
 // Create a new RTCPeerConnection and handle events
 function createPeerConnection(peerId: string): RTCPeerConnection {
-  const peerConnection = new RTCPeerConnection();
+  const peerConnection = new RTCPeerConnection(ICE_SERVERS);
   peers.set(peerId, peerConnection);
-
-  // Handle ICE candidates
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      // ICE candidates should be included in the SDP offer/answer for manual signaling
-      // Since we're doing manual signaling, we don't need to handle them here
-    }
-  };
 
   const dataChannel = peerConnection.createDataChannel('game');
   dataChannels.set(peerId, dataChannel);
@@ -58,7 +51,6 @@ function createPeerConnection(peerId: string): RTCPeerConnection {
   dataChannel.onmessage = (event) => {
     const input: Directions = new Set(JSON.parse(event.data));
     playerInputs[peerId] = input;
-    // handlePlayerInput(input, peerId);
   };
 
   dataChannel.onopen = () => {
@@ -90,7 +82,7 @@ function createPeerConnection(peerId: string): RTCPeerConnection {
   await peerConnection.setLocalDescription(offer);
 
   // Wait for ICE gathering to complete
-  await waitForICEGatheringComplete(peerConnection);
+  await waitForICEGatheringComplete(peerConnection, true);
 
   // Display the offer for players to use
   hostOfferTextarea.value = JSON.stringify(peerConnection.localDescription);

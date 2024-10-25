@@ -22,18 +22,33 @@ export function getDirectionFromKey(key: string): Direction | null {
 }
 
 // Utility function to wait until ICE gathering is complete
-export function waitForICEGatheringComplete(pc: RTCPeerConnection): Promise<void> {
+export function waitForICEGatheringComplete(pc: RTCPeerConnection, isHost: boolean): Promise<void> {
   return new Promise((resolve) => {
     if (pc.iceGatheringState === 'complete') {
       resolve();
     } else {
-      const checkState = () => {
-        if (pc.iceGatheringState === 'complete') {
-          pc.removeEventListener('icegatheringstatechange', checkState);
-          resolve();
-        }
-      };
-      pc.addEventListener('icegatheringstatechange', checkState);
+      if (isHost) {
+        // Handle ICE candidates
+        pc.onicecandidate = (event) => {
+          if (event.candidate) {
+            console.log("New ICE candidate", event.candidate);
+            if (event.candidate.type === 'srflx') {
+              resolve();
+            }
+            // ICE candidates should be included in the SDP offer/answer for manual signaling
+            // Since we're doing manual signaling, we don't need to handle them here
+          }
+        };
+      }
+      else {
+        const checkState = () => {
+          if (pc.iceGatheringState === 'complete') {
+            pc.removeEventListener('icegatheringstatechange', checkState);
+            resolve();
+          }
+        };
+        pc.addEventListener('icegatheringstatechange', checkState);
+      }
     }
   });
 }

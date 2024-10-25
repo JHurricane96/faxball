@@ -3,6 +3,7 @@ import { copyToClipboard } from "./clipboard";
 import { Game } from "./game";
 import { Directions, GameState } from "./types";
 import { getDirectionFromKey, waitForICEGatheringComplete } from "./utils";
+import { ICE_SERVERS } from './stun_servers';
 
 // UI Elements
 const signalingDiv = document.getElementById('signaling') as HTMLDivElement;
@@ -36,7 +37,6 @@ function handlePlayerMovement() {
     const direction = getDirectionFromKey(e.key);
     if (direction) {
       pressedKeys.add(direction);
-      console.log("Keydown: " + direction);
       sendPlayerInput();
     }
   });
@@ -44,7 +44,6 @@ function handlePlayerMovement() {
     const direction = getDirectionFromKey(e.key);
     if (direction) {
       pressedKeys.delete(direction);
-      console.log("Keyup: " + direction);
       sendPlayerInput();
     }
   });
@@ -58,15 +57,13 @@ playerCreateAnswerButton.onclick = async () => {
   }
 
   const offer = new RTCSessionDescription(JSON.parse(offerText));
-  const peerConnection = new RTCPeerConnection();
+  const peerConnection = new RTCPeerConnection(ICE_SERVERS);
 
   peerConnection.ondatachannel = (event) => {
     dataChannel = event.channel;
-    // dataChannels.set('host', dataChannel);
     console.log("Data channel created for host");
 
     dataChannel.onmessage = (event) => {
-      console.log('Received message from host:', event.data);
       gameState = JSON.parse(event.data);
 
       // Start game loop upon receiving the first game state
@@ -86,13 +83,6 @@ playerCreateAnswerButton.onclick = async () => {
     dataChannel.onclose = () => {
       console.log('Data channel to host closed');
     };
-  }
-
-  // Handle ICE candidates
-  peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
-      // ICE candidates should be included in the SDP offer/answer for manual signaling
-    }
   };
 
   await peerConnection.setRemoteDescription(offer);
@@ -101,7 +91,7 @@ playerCreateAnswerButton.onclick = async () => {
   await peerConnection.setLocalDescription(answer);
 
   // Wait for ICE gathering to complete
-  await waitForICEGatheringComplete(peerConnection);
+  await waitForICEGatheringComplete(peerConnection, false);
 
   // Display the answer for the player to share with the host
   playerAnswerTextarea.value = JSON.stringify(peerConnection.localDescription);
